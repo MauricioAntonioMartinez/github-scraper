@@ -22,7 +22,9 @@ func main(){
 	}
 
 	 defer resp.Body.Close()
+
 	fmt.Println("This is a test this is awesome")
+
 	fmt.Println("Another print, because they ask")
 	//  body,_ := ioutil.ReadAll(resp.Body)
 
