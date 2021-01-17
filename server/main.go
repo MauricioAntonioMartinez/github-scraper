@@ -22,7 +22,7 @@ func main(){
 	}
 
 	 defer resp.Body.Close()
-
+	fmt.Println("This is a test")
 	//  body,_ := ioutil.ReadAll(resp.Body)
 
 	 users := &Users{}
