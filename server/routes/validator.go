@@ -1,59 +1,66 @@
+package routes
 
+import (
+	"errors"
+)
 
 type (
-
-
-	 Validtable interface { 
-		 validate()error
+	Validtable interface {
+		validate() error
 	}
-	
-	
-	 Validator struct {
-	
-	}
-
+	Validator struct{}
 	RuleField struct {
 		message string
 		Rule
 	}
-	
-	 Rule interface {
-		validate(field interface{}) error	
+	Rule interface {
+		validate(value interface{}) error
 	}
-	
-	 FieldRules struct {
+	FieldRules struct {
 		field interface{}
 		rules []Rule
 	}
 
-	
+	required struct{}
 )
 
-func Required (message string) RuleField {
+func (required) validate(value interface{}) error {
+	var err error
+	if err = nil; value == nil {
+		if str, ok := value.(string); ok {
+			err = errors.New(str + ": is required.")
+		} else {
+			err = errors.New("This is required")
+		}
+
+	}
+
+	return err
+}
+
+func Required(message string) *RuleField {
 
 	return &RuleField{
-		message:message,
-		validate: func(){
-			return 
+		message: message,
+		Rule:    required{},
+	}
+}
+
+func (v Validator) Field(field *interface{}, rules ...Rule) []error {
+
+	var errors = []error{}
+
+	for _, rl := range rules {
+		er := rl.validate(field)
+		if er != nil {
+			errors = append(errors, er)
 		}
 	}
-} 
 
-func(v Validator) Field(field *interface{},...Rule)  {
+	return errors
 
 }
 
-func ValidateStruct(obj interface{},validators ...FieldRules)  {
+func ValidateStruct(obj interface{}, validators ...FieldRules) {
 
-
-
-	return &FieldRules{
-		field:obj,
-		rules:FieldRules
-	}
-}
-
-func (v Vli) validate(obj interface{},) error{
-
-	return error("Something went wrong")
 }
