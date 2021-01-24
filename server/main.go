@@ -14,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/utils"
+	"github.com/gofiber/helmet/v2"
 	jwtware "github.com/gofiber/jwt/v2"
 	"github.com/gofiber/storage/sqlite3"
 	"github.com/qinains/fastergoding"
@@ -25,11 +26,12 @@ func main() {
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
 			return ctx.Status(400).JSON(fiber.Map{
 				"success": false,
-				"message": err.Error(),
-				"errors":  fiber.Map{"type": "unknown", "field": "This ass"}},
+				"message": err.Error()},
 			)
 		},
 	})
+
+	app.Use(helmet.New())
 
 	jwtCheck := jwtware.New(jwtware.Config{
 		SigningKey: []byte("thisismysecret"),
@@ -64,7 +66,6 @@ func main() {
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 	}))
-
 	app.Use(logger.New(logger.Config{
 		Format:     "${pid} ${locals:mcuve-key} ${status} - ${method} ${path}\n",
 		TimeFormat: "18-Jan-2021",
@@ -81,9 +82,11 @@ func main() {
 	app.Use(recover.New())
 
 	routes.AuthRoutes(app, jwtCheck, baseLimiter)
+	routes.ChatRoutes(app)
 	routes.BasicsRoutes(app, withAuth, jwtCheck, baseLimiter)
 
 	app.Static("/files", "./public")
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":4000"))
 }
+
